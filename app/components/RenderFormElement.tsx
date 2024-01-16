@@ -1,4 +1,5 @@
-import { FormElement } from "../page";
+import { Dispatch, SetStateAction } from "react";
+import { FormElement, State } from "../page";
 
 export enum FormElements {
 	Input = "input",
@@ -10,14 +11,14 @@ export const RenderFormElement = ({
 	setState,
 }: {
 	element: FormElement;
-	setState: () => void;
+	setState: Dispatch<SetStateAction<string>>;
 }) => {
-	console.log("element: ", element);
 	const { type } = element;
 
 	if (type === FormElements.Input) {
-		console.log("element.value: ", element.value);
-		return <input value={element.value} onChange={setState} />;
+		return (
+			<input value={element.value} onChange={(e) => setState(e.target.value)} />
+		);
 	} else if (type === FormElements.Select) {
 		return <div>Select</div>;
 	}

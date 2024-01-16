@@ -5,7 +5,7 @@ import {
 	FormElements,
 	RenderFormElement,
 } from "./components/RenderFormElement";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 const state: State = {
 	forms: [
@@ -55,17 +55,46 @@ const state: State = {
 	],
 };
 
-const renderForm = (formElements: FormElement[]) =>
-	formElements.map((e, i) => (
-		<div key={`element-${i}`} className="my-3">
-			<RenderFormElement element={e} setState={() => {}} />
-		</div>
-	));
+const renderForm = (
+	formState: Form,
+	setGlobalState: Dispatch<SetStateAction<State>>
+) =>
+	formState.formElements.map((e, i) => {
+		const setElementState = (value: any) => {
+			setGlobalState((prevValue) => {
+				const updatedForms = prevValue.forms.map((f) => {
+					if (f.formId !== formState.formId) {
+						return f;
+					}
+
+					const updatedFormElements = f.formElements.map((fe) => {
+						if (e.id !== fe.id) {
+							return fe;
+						}
+						const updatedElement = { ...fe, value };
+						return updatedElement;
+					});
+					return { ...f, formElements: updatedFormElements };
+				});
+
+				return { ...prevValue, forms: updatedForms };
+			});
+		};
+		return (
+			<div key={`element-${i}`} className="my-3">
+				<RenderFormElement element={e} setState={setElementState} />
+			</div>
+		);
+	});
 
 export default function Home() {
 	const [selectedTemplate, setSelectedTemplate] = useState<string>("");
-	const selectedForm = state.forms.find((f) => f.formId === selectedTemplate);
-	const selectedFormElements = selectedForm?.formElements;
+	const [globalState, setGlobalState] = useState(state);
+	const selectedFormState = globalState.forms.find(
+		(f) => f.formId === selectedTemplate
+	);
+	const selectedFormStateElements = selectedFormState?.formElements;
+	const selectedFormStateId = selectedFormState?.formId;
 
 	return (
 		<div className="flex align-middle flex-col">
@@ -90,7 +119,9 @@ export default function Home() {
 					})}
 				</Select>
 			</div>
-			{selectedFormElements && renderForm(selectedFormElements)}
+			{selectedFormStateElements &&
+				selectedFormStateId &&
+				renderForm(selectedFormState, setGlobalState)}
 		</div>
 	);
 }
@@ -109,6 +140,6 @@ type Form = {
 	formElements: FormElement[];
 };
 
-type State = {
+export type State = {
 	forms: Form[];
 };
