@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { FormElement, State } from "../page";
+import { TextInput } from "flowbite-react";
 
 export enum FormElements {
 	Input = "input",
@@ -17,7 +18,10 @@ export const RenderFormElement = ({
 
 	if (type === FormElements.Input) {
 		return (
-			<input value={element.value} onChange={(e) => setState(e.target.value)} />
+			<TextInput
+				value={element.value}
+				onChange={(e) => setState(e.target.value)}
+			/>
 		);
 	} else if (type === FormElements.Select) {
 		return <div>Select</div>;
