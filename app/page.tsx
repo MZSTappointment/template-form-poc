@@ -24,13 +24,25 @@ const state: State = {
 					label: "Gender",
 					type: FormElements.Select,
 					value: "",
-					values: ["Male", "Female"],
+					customProps: {
+						selectElements: [
+							{ label: "Male", value: "male" },
+							{ label: "Female", value: "female" },
+							{ label: "Other", value: "other" },
+						],
+					},
 				},
 				{
 					id: "3",
 					label: "City",
 					type: FormElements.Input,
 					value: "",
+				},
+				{
+					id: "4",
+					label: "Agreed",
+					type: FormElements.Checkbox,
+					value: false,
 				},
 			],
 		},
@@ -88,7 +100,8 @@ const renderForm = (
 	});
 
 export default function Home() {
-	const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+	const [selectedTemplate, setSelectedTemplate] =
+		useState<string>("not-selected");
 	const [globalState, setGlobalState] = useState(state);
 	const selectedFormState = globalState.forms.find(
 		(f) => f.formId === selectedTemplate
@@ -110,7 +123,9 @@ export default function Home() {
 					}}
 					value={selectedTemplate}
 				>
-					<option selected>Choose a country</option>
+					<option disabled value={"not-selected"}>
+						Choose a country
+					</option>
 					{state.forms.map(({ formName, formId }, index) => {
 						return (
 							<option key={formName + index} value={formId}>
@@ -127,14 +142,6 @@ export default function Home() {
 	);
 }
 
-export type FormElement = {
-	id: string;
-	label: string;
-	type: FormElements;
-	value: string;
-	values?: string[];
-};
-
 type Form = {
 	formId: string;
 	formName: string;
@@ -144,3 +151,31 @@ type Form = {
 export type State = {
 	forms: Form[];
 };
+
+type BaseFormElement = {
+	id: string;
+	label: string;
+};
+
+export type InputFormElement = BaseFormElement & {
+	type: FormElements.Input;
+	value: string;
+	customProps?: {};
+};
+
+export type SelectFormElement = BaseFormElement & {
+	type: FormElements.Select;
+	value: string;
+	customProps: { selectElements: { label: string; value: string }[] };
+};
+
+export type CheckboxFormElement = BaseFormElement & {
+	type: FormElements.Checkbox;
+	value: boolean;
+	customProps?: {};
+};
+
+export type FormElement =
+	| InputFormElement
+	| SelectFormElement
+	| CheckboxFormElement;
