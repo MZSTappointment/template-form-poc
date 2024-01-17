@@ -110,6 +110,7 @@ export default function Home() {
 					}}
 					value={selectedTemplate}
 				>
+					<option selected>Choose a country</option>
 					{state.forms.map(({ formName, formId }, index) => {
 						return (
 							<option key={formName + index} value={formId}>
