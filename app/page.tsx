@@ -1,8 +1,8 @@
 "use client";
 
 import { Label, Select } from "flowbite-react";
-import { RenderFormElement } from "./components/RenderFormElement";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
+import { RenderForm } from "./components/RenderForm";
 
 export enum FormElements {
 	Input = "input",
@@ -84,46 +84,7 @@ const state: State = {
 			],
 		},
 	],
-};
-
-const RenderForm = ({
-	formState,
-	setGlobalState,
-}: {
-	formState: Form;
-	setGlobalState: Dispatch<SetStateAction<State>>;
-}) => {
-	return (
-		<>
-			{formState.formElements.map((e, i) => {
-				const setElementState = (value: any) => {
-					setGlobalState((prevValue) => {
-						const updatedForms = prevValue.forms.map((f) => {
-							if (f.formId !== formState.formId) {
-								return f;
-							}
-
-							const updatedFormElements = f.formElements.map((fe) => {
-								if (e.id !== fe.id) {
-									return fe;
-								}
-								const updatedElement = { ...fe, value };
-								return updatedElement;
-							});
-							return { ...f, formElements: updatedFormElements };
-						});
-
-						return { ...prevValue, forms: updatedForms };
-					});
-				};
-				return (
-					<div key={`element-${i}`} className="my-3">
-						<RenderFormElement element={e} setElementState={setElementState} />
-					</div>
-				);
-			})}
-		</>
-	);
+	templates: [],
 };
 
 export default function Home() {
@@ -172,14 +133,21 @@ export default function Home() {
 	);
 }
 
-type Form = {
+export type Form = {
 	formId: string;
 	formName: string;
 	formElements: FormElement[];
 };
 
+type Template = {
+	templateId: string;
+	templateName: string;
+	templateElements: FormElement[];
+};
+
 export type State = {
 	forms: Form[];
+	templates: Template[];
 };
 
 type BaseFormElement = {
