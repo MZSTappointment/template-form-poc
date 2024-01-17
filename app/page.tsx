@@ -82,7 +82,7 @@ const renderForm = (
 		};
 		return (
 			<div key={`element-${i}`} className="my-3">
-				<RenderFormElement element={e} setState={setElementState} />
+				<RenderFormElement element={e} setElementState={setElementState} />
 			</div>
 		);
 	});

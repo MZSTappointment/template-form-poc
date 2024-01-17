@@ -9,10 +9,10 @@ export enum FormElements {
 
 export const RenderFormElement = ({
 	element,
-	setState,
+	setElementState,
 }: {
 	element: FormElement;
-	setState: Dispatch<SetStateAction<string>>;
+	setElementState: Dispatch<SetStateAction<string>>;
 }) => {
 	const { type } = element;
 
@@ -20,7 +20,7 @@ export const RenderFormElement = ({
 		return (
 			<TextInput
 				value={element.value}
-				onChange={(e) => setState(e.target.value)}
+				onChange={(e) => setElementState(e.target.value)}
 			/>
 		);
 	} else if (type === FormElements.Select) {
