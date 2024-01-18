@@ -3,6 +3,7 @@
 import { Label, Select, Button, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { RenderForm } from "./components/RenderForm";
+import { v4 as uuidv4 } from "uuid";
 
 export enum FormElements {
 	Input = "input",
@@ -85,45 +86,75 @@ const state: State = {
 			],
 		},
 	],
-	templateElements: [],
 };
+
+const createEmptyForm = (formName: string) => {
+	return {
+		formId: uuidv4(),
+		formName,
+		formElements: [],
+	};
+};
+
+const emptyFormElements = {
+	[FormElements.Input]: {
+		type: FormElements.Input,
+		value: "",
+		customProps: {},
+	},
+	[FormElements.Textarea]: {
+		type: FormElements.Textarea,
+		value: "",
+		customProps: {},
+	},
+	[FormElements.Select]: {
+		type: FormElements.Select,
+		value: "",
+		customProps: {
+			selectElements: [
+				{ label: "1", value: "1" },
+				{ label: "2", value: "2" },
+				{ label: "3", value: "3" },
+			],
+		},
+	},
+	[FormElements.Checkbox]: {
+		label: "",
+		type: FormElements.Checkbox,
+		value: false,
+		customProps: {},
+	},
+	[FormElements.Toggle]: {
+		label: "",
+		type: FormElements.Toggle,
+		value: false,
+		customProps: {},
+	},
+};
+
+const createEmptyFormElement = (elementType: FormElements, label: string) =>
+	({
+		...emptyFormElements[elementType],
+		id: uuidv4(),
+		label,
+	} as FormElement);
 
 export default function Home() {
 	const [selectedForm, setSelectedForm] = useState<string>(NOT_SELECTED);
-	const [selectedFormElement, setSelectedFormElement] =
-		useState<string>(NOT_SELECTED);
 	const [formName, setFormName] = useState("");
 	const [globalState, setGlobalState] = useState(state);
+	const [selectedFormElement, setSelectedFormElement] = useState<{
+		type: FormElements | typeof NOT_SELECTED;
+		label: string;
+	}>({ type: NOT_SELECTED, label: "" });
 	const selectedFormState = globalState.forms.find(
 		(f) => f.formId === selectedForm
 	);
 
 	return (
-		<div className="flex align-middle flex-col gap-10">
+		<div className="flex align-middle flex-col gap-10 p-10">
 			<div className="text-base text-gray-900 dark:text-white">
-				Template creator
-			</div>
-			<div className="flex gap-10">
-				<Select
-					id="formElements"
-					required
-					onChange={(e) => {
-						setSelectedFormElement(e.target.value);
-					}}
-					value={selectedFormElement}
-				>
-					<option disabled value={NOT_SELECTED}>
-						Choose a form element to add
-					</option>
-					{Object.values(FormElements).map((value) => (
-						<option key={value} value={value}>
-							{value}
-						</option>
-					))}
-				</Select>
-				<Button color="blue" disabled={selectedFormElement === NOT_SELECTED}>
-					Add +
-				</Button>
+				Form creator
 			</div>
 			<div className="flex gap-10">
 				<TextInput
@@ -132,8 +163,16 @@ export default function Home() {
 					placeholder="Add form name"
 				/>
 				<Button
-					color="blue"
-					disabled={!formName || globalState.templateElements.length === 0}
+					disabled={!formName}
+					onClick={() => {
+						setGlobalState((prevValue) => {
+							return {
+								...prevValue,
+								forms: [...prevValue.forms, createEmptyForm(formName)],
+							};
+						});
+						setFormName("");
+					}}
 				>
 					Create new form
 				</Button>
@@ -155,7 +194,7 @@ export default function Home() {
 					<option disabled value={NOT_SELECTED}>
 						Choose a form
 					</option>
-					{state.forms.map(({ formName, formId }, index) => {
+					{globalState.forms.map(({ formName, formId }, index) => {
 						return (
 							<option key={formName + index} value={formId}>
 								{formName}
@@ -170,6 +209,66 @@ export default function Home() {
 						formState={selectedFormState}
 						setGlobalState={setGlobalState}
 					/>
+					<hr className="my-8" />
+					<div className="flex gap-10 m">
+						<Select
+							id="formElements"
+							required
+							onChange={(e) => {
+								setSelectedFormElement((prevValue) => ({
+									...prevValue,
+									type: e.target.value as FormElements,
+								}));
+							}}
+							value={selectedFormElement.type}
+						>
+							<option disabled value={NOT_SELECTED}>
+								Choose a form element to add
+							</option>
+							{Object.values(FormElements).map((value) => (
+								<option key={value} value={value}>
+									{value}
+								</option>
+							))}
+						</Select>
+						<TextInput
+							value={selectedFormElement.label}
+							onChange={(e) =>
+								setSelectedFormElement((prevValue) => ({
+									...prevValue,
+									label: e.target.value,
+								}))
+							}
+							placeholder="Add form element label"
+						/>
+						<Button
+							disabled={!selectedFormElement.type || !selectedFormElement.label}
+							onClick={() => {
+								setGlobalState((prevValue) => {
+									const updatedForms = prevValue.forms.map((form) => {
+										if (form.formId !== selectedFormState.formId) return form;
+										const updatedForm = {
+											...form,
+											formElements: [
+												...form.formElements,
+												createEmptyFormElement(
+													selectedFormElement.type as FormElements,
+													selectedFormElement.label
+												),
+											],
+										};
+										return updatedForm;
+									});
+									return {
+										...prevValue,
+										forms: updatedForms,
+									};
+								});
+							}}
+						>
+							Add element
+						</Button>
+					</div>
 				</div>
 			)}
 		</div>
@@ -182,16 +281,8 @@ export type Form = {
 	formElements: FormElement[];
 };
 
-type Template = {
-	templateId: string;
-	templateName: string;
-	templateElements: FormElement[];
-};
-
 export type State = {
 	forms: Form[];
-	// templates: Template[];
-	templateElements: [];
 };
 
 type BaseFormElement = {

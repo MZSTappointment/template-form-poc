@@ -16,7 +16,7 @@ export const RenderFormElement = ({
 		const placeholder = customProps?.placeholder || "";
 		return (
 			<>
-				<div>{label}</div>
+				<div className="dark:text-gray-300">{label}</div>
 				<TextInput
 					value={value}
 					onChange={(e) => setElementState(e.target.value)}
