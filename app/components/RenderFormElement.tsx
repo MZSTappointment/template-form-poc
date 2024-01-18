@@ -46,7 +46,7 @@ export const RenderFormElement = ({
 	} else if (type === FormElements.Select) {
 		return (
 			<>
-				<div>{label}</div>
+				<div className="dark:text-gray-300">{label}</div>
 				<Select id={`select-${label}`} required>
 					{customProps.selectElements.map((e) => (
 						<option key={`key-${e.value}`} value={e.value}>

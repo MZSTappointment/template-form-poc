@@ -242,7 +242,10 @@ export default function Home() {
 							placeholder="Add form element label"
 						/>
 						<Button
-							disabled={!selectedFormElement.type || !selectedFormElement.label}
+							disabled={
+								selectedFormElement.type === NOT_SELECTED ||
+								!selectedFormElement.label
+							}
 							onClick={() => {
 								setGlobalState((prevValue) => {
 									const updatedForms = prevValue.forms.map((form) => {
