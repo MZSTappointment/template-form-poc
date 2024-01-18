@@ -140,7 +140,7 @@ export default function Home() {
 			</div>
 
 			<hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
-			<div className="max-w-md mb-1">
+			<div className="max-w-md mb-1 px-10">
 				<div className="mb-2 block">
 					<Label htmlFor="templates" value="Select form" />
 				</div>
@@ -165,10 +165,12 @@ export default function Home() {
 				</Select>
 			</div>
 			{selectedFormState && (
-				<RenderForm
-					formState={selectedFormState}
-					setGlobalState={setGlobalState}
-				/>
+				<div className="p-10">
+					<RenderForm
+						formState={selectedFormState}
+						setGlobalState={setGlobalState}
+					/>
+				</div>
 			)}
 		</div>
 	);
